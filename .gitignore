@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.Python
+*.egg-info/
+
+# Test and lint caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Local state
+data/*
+!data/.gitkeep
+*.db
+*.db-wal
+*.db-shm
+backups/*
+!backups/.gitkeep
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store

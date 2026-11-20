@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: contentops-agent
+  namespace: contentops
+  labels:
+    app.kubernetes.io/name: contentops-agent
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: contentops-agent
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP

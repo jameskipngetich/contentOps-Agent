@@ -1,0 +1,67 @@
+services:
+  app:
+    build:
+      context: .
+    image: contentops-agent:local
+    container_name: contentops-agent
+    ports:
+      - "8080:8000"
+    environment:
+      ENVIRONMENT: local
+      LOG_LEVEL: INFO
+      LOG_FORMAT: json
+      DATABASE_PATH: /data/contentops.db
+      VARIANT_GENERATOR_MODE: mock
+      VARIANT_GENERATOR_BASE_URL: http://host.docker.internal:8000
+      STUDIO_MODE: mock
+      STUDIO_BASE_URL: http://host.docker.internal:3000
+      MOCK_VARIANT_SCENARIO: clean
+      LLM_ENABLED: "false"
+      METRICS_ENABLED: "true"
+      SEMANTIC_THRESHOLD: "0.35"
+      DUPLICATE_THRESHOLD: "0.90"
+    # Makes host.docker.internal resolve on Linux as well, so the http adapter
+    # modes can reach services running on the host.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - contentops-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).status == 200 else 1)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    profiles: ["monitoring"]
+    ports:
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=6h"
+      - "--storage.tsdb.path=/prometheus"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      - app
+    restart: unless-stopped
+
+volumes:
+  contentops-data:
+  prometheus-data:

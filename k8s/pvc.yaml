@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: contentops-agent-data
+  namespace: contentops
+  labels:
+    app.kubernetes.io/name: contentops-agent
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  # kind and Minikube both ship a default StorageClass, so this is left unset. If
+  # your cluster has several classes, set storageClassName explicitly.

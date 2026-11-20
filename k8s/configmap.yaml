@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: contentops-agent-config
+  namespace: contentops
+  labels:
+    app.kubernetes.io/name: contentops-agent
+data:
+  ENVIRONMENT: "local"
+  LOG_LEVEL: "INFO"
+  LOG_FORMAT: "json"
+  DATABASE_PATH: "/data/contentops.db"
+  METRICS_ENABLED: "true"
+
+  # Integrations. Both default to "mock" so the deployment works without the
+  # other services. Set MODE to "http" and update the URL when they are running.
+  VARIANT_GENERATOR_MODE: "mock"
+  VARIANT_GENERATOR_BASE_URL: "http://variant-generator.contentops.svc.cluster.local:8000"
+  STUDIO_MODE: "mock"
+  STUDIO_BASE_URL: "http://social-studio.contentops.svc.cluster.local:3000"
+  MOCK_VARIANT_SCENARIO: "clean"
+
+  # Semantic evaluation stays deterministic unless an LLM key is mounted from a
+  # Secret and LLM_ENABLED is switched to "true".
+  LLM_ENABLED: "false"
+  LLM_MODEL: "gpt-4o-mini"
+  SEMANTIC_THRESHOLD: "0.35"
+  DUPLICATE_THRESHOLD: "0.90"
